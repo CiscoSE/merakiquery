@@ -1,4 +1,4 @@
 [application]
-serveraddress: {PRIME INFRASTRUCTURE SERVER IP OR DNS}
-username: {USERNAME FOR API QUERIES}
-password: {PASSWORD}
+serveraddress: dashboard.meraki.com
+merakiAPIkey: {INSERT Meraki API Key}
+organization: {Organization ID}
