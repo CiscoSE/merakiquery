@@ -49,7 +49,7 @@ if organization is "":
     getorganization(serveraddress,merakiAPIkey)
     exit()
 
-
+print "Meraki Configuration:"
 print "Meraki Server Address: "+serveraddress
 print "Meraki API Key: "+merakiAPIkey
 print "Organization ID: "+organization
