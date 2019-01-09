@@ -11,7 +11,7 @@ def getorganization(server,merakiAPIkey):
     base_url = "https://" + server + "/api/v0/organizations"
     headers = {'X-Cisco-Meraki-API-Key': merakiAPIkey}
 
-    # Send the query to the Prime Infrastructure Server
+    # Send the query to the Meraki API
     r = requests.get(base_url,headers=headers)
 
     # Retrieve the results in JSON format
@@ -55,12 +55,12 @@ print "Meraki API Key: "+merakiAPIkey
 print "Organization ID: "+organization
 
 
-# Construct the url for querying Prime Infrastructure
+# Construct the url for querying the Meraki API
 base_url="https://"+serveraddress+"/api/v0"
 config_url="/organizations/"+organization+"/networks"
 headers = {'X-Cisco-Meraki-API-Key':merakiAPIkey}
 
-# Send the query to the Prime Infrastructure Server
+# Send the query to the Meraki API
 r = requests.get(base_url+config_url,headers=headers)
 
 # Retrieve the results in JSON format
@@ -88,7 +88,7 @@ print '=========================================================================
 serialnumlist=[]
 
 for item in json_string:
-# Iterate through each record that was returned from Prime Infrastructure
+# Iterate through each record that was returned from the Meraki API
 
 
     # Extract all the appropriate fields
