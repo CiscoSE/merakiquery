@@ -60,8 +60,24 @@ base_url="https://"+serveraddress+"/api/v0"
 config_url="/organizations/"+organization+"/networks"
 headers = {'X-Cisco-Meraki-API-Key':merakiAPIkey}
 
+
 # Send the query to the Meraki API
 r = requests.get(base_url+config_url,headers=headers)
+
+if r.status_code != 200:
+    print "ERROR: Unable to connect to Meraki API: Status Code "+str(r.status_code)
+
+    if r.status_code == 400:
+        print "400: Bad Request- You did something wrong, e.g. a malformed request or missing parameter."
+    elif r.status_code == 403:
+        print "403: Forbidden- You don't have permission to do that."
+    elif r.status_code == 404:
+        print "404: Not found- No such URL, or you don't have access to the API or organization at all."
+    else:
+        print "Unknown Return Code"
+
+    exit()
+
 
 # Retrieve the results in JSON format
 json_string = r.json()
@@ -105,8 +121,14 @@ for item in json_string:
     print '{0:20} {1:20} {2:20} {3:30} {4:20}'.format(devicename, macAddress, serialnum,ipaddress, devicetype)
 
 
+
 for item in serialnumlist:
     print "\nQuerying Meraki for clients on Network: " + item.get("name")+ " (" + item.get("serial") + ")"
+
+    if item.get('model')[:2] == "MV":
+        print "Currently Cameras are not suppported"
+        continue
+
     print '{0:20} {1:30} {2:16} {3:18} {4:10}   {5:11}  {6:11}'.format("Hostname", "Description", "IP Address", "MAC Address",
                                                       "Switchport", "Sent KBytes", "Recv KBytes")
     print '===================================================================================================================================================='
