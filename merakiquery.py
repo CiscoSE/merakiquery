@@ -82,73 +82,71 @@ if r.status_code != 200:
 # Retrieve the results in JSON format
 json_string = r.json()
 
-for item in json_string:
+for network in json_string:
 
-    if item['type'] == "combined" or item['type'] == "wireless" or item['type'] == "switch" :
-        network = item['id']
+    if network['type'] == "combined" or network['type'] == "wireless" or network['type'] == "switch"  or \
+            network['type'] == "appliance":
+
+        network_id = network['id']
         found_network = True
 
-if not found_network:
-    print "No Valid Network Found..."
-    exit()
+        print "\nQuerying Meraki for Devices on Network: "+network['name']+",  ID: "+network_id
 
-print "\nQuerying Meraki for Devices on Network: "+network
+        config_url = "/networks/"+network_id+"/devices"
+        r = requests.get(base_url+config_url,headers=headers)
+        json_string = r.json()
 
-config_url = "/networks/"+network+"/devices"
-r = requests.get(base_url+config_url,headers=headers)
-json_string = r.json()
+        print '{0:20} {1:20} {2:20} {3:30} {4:20}'.format("Switch Name", "MAC Address", "Device Vendor", "IP Address","Device Type")
+        print '==============================================================================================================================='
 
-print '{0:20} {1:20} {2:20} {3:30} {4:20}'.format("Switch Name", "MAC Address", "Device Vendor", "IP Address","Device Type")
-print '==============================================================================================================================='
+        serialnumlist=[]
 
-serialnumlist=[]
-
-for item in json_string:
-# Iterate through each record that was returned from the Meraki API
+        for item in json_string:
+        # Iterate through each record that was returned from the Meraki API
 
 
-    # Extract all the appropriate fields
-    devicename = item.get("name")
-    macAddress = item.get("mac")
-    serialnum = item.get("serial")
+            # Extract all the appropriate fields
+            devicename = item.get("name")
+            macAddress = item.get("mac")
+            serialnum = item.get("serial")
 
-    serialnumlist.append(item)
+            serialnumlist.append(item)
 
-    devicetype = item.get("model")
-    ipaddress = item.get("lanIp")
+            devicetype = item.get("model")
+            ipaddress = item.get("lanIp")
 
-    # Print the resulting data to the screen
-    print '{0:20} {1:20} {2:20} {3:30} {4:20}'.format(devicename, macAddress, serialnum,ipaddress, devicetype)
+            # Print the resulting data to the screen
+            print '{0:20} {1:20} {2:20} {3:30} {4:20}'.format(devicename, macAddress, serialnum,ipaddress, devicetype)
 
 
 
-for item in serialnumlist:
-    print "\nQuerying Meraki for clients on Network: " + item.get("name")+ " (" + item.get("serial") + ")"
+        for item in serialnumlist:
+            print "\nQuerying Meraki for clients on Network: " + item.get("name")+ " (" + item.get("serial") + ")"
 
-    if item.get('model')[:2] == "MV":
-        print "Currently Cameras are not suppported"
-        continue
+            if item.get('model')[:2] == "MV":
+                print "Currently Cameras are not suppported"
+                continue
 
-    print '{0:20} {1:30} {2:16} {3:18} {4:10}   {5:11}  {6:11}'.format("Hostname", "Description", "IP Address", "MAC Address",
-                                                      "Switchport", "Sent KBytes", "Recv KBytes")
-    print '===================================================================================================================================================='
+            print '{0:20} {1:30} {2:16} {3:18} {4:10}   {5:11}  {6:11}'.format("Hostname", "Description", "IP Address", "MAC Address",
+                                                              "Switchport", "Sent KBytes", "Recv KBytes")
+            print '===================================================================================================================================================='
 
-    config_url = "/devices/" + item.get("serial") + "/clients?timespan=86400"
-    r = requests.get(base_url + config_url, headers=headers)
-    json_string = r.json()
+            config_url = "/devices/" + item.get("serial") + "/clients?timespan=86400"
+            r = requests.get(base_url + config_url, headers=headers)
+            json_string = r.json()
 
-    for client in json_string:
+            for client in json_string:
 
-        hostname = client.get("dhcpHostname")
-        description = client.get("description")
-        ipaddress = client.get("ip")
-        macaddress = client.get("mac")
-        switchport = client.get("switchport")
-        usage = client.get("usage")
-        sentbytes = usage.get("sent")
-        recvbytes = usage.get("recv")
+                hostname = client.get("dhcpHostname")
+                description = client.get("description")
+                ipaddress = client.get("ip")
+                macaddress = client.get("mac")
+                switchport = client.get("switchport")
+                usage = client.get("usage")
+                sentbytes = usage.get("sent")
+                recvbytes = usage.get("recv")
 
-        print '{0:20.20} {1:30} {2:16} {3:18} {4:^10}   {5:11.2f}  {6:11.2f}'.format(hostname, description, ipaddress, macaddress, switchport,sentbytes, recvbytes)
+                print '{0:20.20} {1:30} {2:16} {3:18} {4:^10}   {5:11.2f}  {6:11.2f}'.format(hostname, description, ipaddress, macaddress, switchport,sentbytes, recvbytes)
 
 exit()
 
